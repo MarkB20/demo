@@ -1,0 +1,56 @@
+name: demo
+
+topology:
+  nodes:
+    srl:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:latest
+
+    vswitchSrl:
+      kind: juniper_vjunosswitch
+      image: vrnetlab/vr-vjunosswitch:23.2R1.14
+      mgmt-ipv4: 192.168.122.102
+      startup-config: vjunosSrl.cfg 
+
+    PC1:
+      kind: linux
+      image: praqma/network-multitool:latest
+
+    PC2:
+      kind: linux
+      image: praqma/network-multitool:latest
+
+
+    frr:
+      kind: linux
+      image: frrouting/frr:v7.5.1
+      binds:
+        - frr/daemons:/etc/frr/daemons
+        - frr/frr.conf:/etc/frr/frr.conf
+
+    vswitchFrr:
+      kind: juniper_vjunosswitch
+      image: vrnetlab/vr-vjunosswitch:23.2R1.14
+      mgmt-ipv4: 192.168.122.12
+      startup-config: vjunosFrr.cfg
+
+    PC3:
+      kind: linux
+      image: praqma/network-multitool:latest
+
+    PC4:
+      kind: linux
+      image: praqma/network-multitool:latest
+
+  links:
+    # connects the two routers
+    - endpoints: ["srl:e1-1", "frr:eth1"]
+    # connects the nokia router to the switchs to pcs
+    - endpoints: ["srl:e1-2", "vswitchSrl:eth1"]
+    - endpoints: ["vswitchSrl:eth2", "PC1:eth1"]
+    - endpoints: ["vswitchSrl:eth3", "PC2:eth1"]
+    # connects the frr router to the switchs to pcs
+    - endpoints: [ "frr:eth2", "vswitchFrr:eth1"]
+    - endpoints: ["vswitchFrr:eth2", "PC3:eth1"]
+    - endpoints: ["vswitchFrr:eth3", "PC4:eth1"] 
+    
