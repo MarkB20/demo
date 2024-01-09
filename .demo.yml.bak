@@ -1,15 +1,18 @@
 name: demo
 
+mgmt:
+  external-access: false # 
+
 topology:
   nodes:
     srl:
       kind: nokia_srlinux
       image: ghcr.io/nokia/srlinux:latest
 
+
     vswitchSrl:
       kind: juniper_vjunosswitch
       image: vrnetlab/vr-vjunosswitch:23.2R1.14
-      mgmt-ipv4: 192.168.122.102
       startup-config: vjunosSrl.cfg 
 
     PC1:
@@ -27,12 +30,11 @@ topology:
       binds:
         - frr/daemons:/etc/frr/daemons
         - frr/frr.conf:/etc/frr/frr.conf
-
+    
     vswitchFrr:
       kind: juniper_vjunosswitch
       image: vrnetlab/vr-vjunosswitch:23.2R1.14
-      mgmt-ipv4: 192.168.122.12
-      startup-config: vjunosFrr.cfg
+      startup-config: vjunosFrr.cfg 
 
     PC3:
       kind: linux
@@ -49,8 +51,8 @@ topology:
     - endpoints: ["srl:e1-2", "vswitchSrl:eth1"]
     - endpoints: ["vswitchSrl:eth2", "PC1:eth1"]
     - endpoints: ["vswitchSrl:eth3", "PC2:eth1"]
-    # connects the frr router to the switchs to pcs
-    - endpoints: [ "frr:eth2", "vswitchFrr:eth1"]
+    # connects the frr router to the pcs
+    - endpoints: ["frr:eth2", "vswitchFrr:eth1"]
     - endpoints: ["vswitchFrr:eth2", "PC3:eth1"]
     - endpoints: ["vswitchFrr:eth3", "PC4:eth1"] 
     
